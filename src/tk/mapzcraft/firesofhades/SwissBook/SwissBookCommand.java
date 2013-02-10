@@ -190,11 +190,9 @@ public class SwissBookCommand implements CommandExecutor {
 					sender.sendMessage(newContent + "(PREVIEW!!!)");
 					return true;
 				} else {
-					player.getInventory().remove(book);
+					player.getInventory().remove(player.getInventory().getHeldItemSlot());
 					bm.setPages(pages);
 					book.setItemMeta(bm);
-					player.getInventory().addItem(book);
-					player.updateInventory();
 					sender.sendMessage("Text replaced!");
 					return true;
 				}
@@ -206,10 +204,8 @@ public class SwissBookCommand implements CommandExecutor {
 					return true;
 				}
 				bm.setAuthor(args[1]);
-				player.getInventory().remove(book);
+				player.getInventory().remove(player.getInventory().getHeldItemSlot());
 				book.setItemMeta(bm);
-				player.getInventory().addItem(book);
-				player.updateInventory();
 				sender.sendMessage("Author changed!");
 				return true;
 			}
@@ -228,10 +224,8 @@ public class SwissBookCommand implements CommandExecutor {
 				x = newContent.length();
 				newContent = newContent.substring(0, x - 1);
 				bm.setTitle(newContent);
-				player.getInventory().remove(book);
+				player.getInventory().remove(player.getInventory().getHeldItemSlot());
 				book.setItemMeta(bm);
-				player.getInventory().addItem(book);
-				player.updateInventory();
 				sender.sendMessage("Title changed!");
 				return true;
 			}
@@ -305,10 +299,8 @@ public class SwissBookCommand implements CommandExecutor {
 				}
 				pages.set(page1 - 1, newContent);
 				bm.setPages(pages);
-				player.getInventory().remove(book);
+				player.getInventory().remove(player.getInventory().getHeldItemSlot());
 				book.setItemMeta(bm);
-				player.getInventory().addItem(book);
-				player.updateInventory();
 				sender.sendMessage("Text copied and replaced!");
 				return true;
 			}
@@ -383,11 +375,9 @@ public class SwissBookCommand implements CommandExecutor {
 					sender.sendMessage(newContent + "(PREVIEW!!!)");
 					return true;
 				} else {
-					player.getInventory().remove(book);
+					player.getInventory().remove(player.getInventory().getHeldItemSlot());
 					bm.setPages(pages);
 					book.setItemMeta(bm);
-					player.getInventory().addItem(book);
-					player.updateInventory();
 					sender.sendMessage("Text inserted!");
 					return true;
 				}
@@ -487,10 +477,8 @@ public class SwissBookCommand implements CommandExecutor {
 				}
 				pages.set(page1 - 1, newContent);
 				bm.setPages(pages);
-				player.getInventory().remove(book);
+				player.getInventory().remove(player.getInventory().getHeldItemSlot());
 				book.setItemMeta(bm);
-				player.getInventory().addItem(book);
-				player.updateInventory();
 				sender.sendMessage("Text copied!");
 				return true;
 			}
@@ -543,11 +531,9 @@ public class SwissBookCommand implements CommandExecutor {
 					sender.sendMessage(newContent + "(PREVIEW!!!)");
 					return true;
 				} else {
-					player.getInventory().remove(book);
+					player.getInventory().remove(player.getInventory().getHeldItemSlot());
 					bm.setPages(pages);
 					book.setItemMeta(bm);
-					player.getInventory().addItem(book);
-					player.updateInventory();
 					sender.sendMessage("Text deleted!");
 					return true;
 				}
@@ -585,11 +571,9 @@ public class SwissBookCommand implements CommandExecutor {
 					pages.add("");
 					page = page - 1;
 				}
-				player.getInventory().remove(book);
+				player.getInventory().remove(player.getInventory().getHeldItemSlot());
 				bm.setPages(pages);
 				book.setItemMeta(bm);
-				player.getInventory().addItem(book);
-				player.updateInventory();
 				sender.sendMessage("Page(s) added!");
 				return true;
 			}
@@ -630,11 +614,9 @@ public class SwissBookCommand implements CommandExecutor {
 					pages.add(fChar - 1, "");
 					page = page - 1;
 				}
-				player.getInventory().remove(book);
+				player.getInventory().remove(player.getInventory().getHeldItemSlot());
 				bm.setPages(pages);
 				book.setItemMeta(bm);
-				player.getInventory().addItem(book);
-				player.updateInventory();
 				sender.sendMessage("Page(s) inserted!");
 				return true;
 			}
@@ -670,11 +652,9 @@ public class SwissBookCommand implements CommandExecutor {
 				pages.remove(page - 1);
 				pages.add(fChar - 1, newContent);
 
-				player.getInventory().remove(book);
+				player.getInventory().remove(player.getInventory().getHeldItemSlot());
 				bm.setPages(pages);
 				book.setItemMeta(bm);
-				player.getInventory().addItem(book);
-				player.updateInventory();
 				sender.sendMessage("Page moved!");
 				return true;
 			}
@@ -719,11 +699,9 @@ public class SwissBookCommand implements CommandExecutor {
 					pages.remove(page - 1);
 				}
 
-				player.getInventory().remove(book);
+				player.getInventory().remove(player.getInventory().getHeldItemSlot());
 				bm.setPages(pages);
 				book.setItemMeta(bm);
-				player.getInventory().addItem(book);
-				player.updateInventory();
 				sender.sendMessage("Page(s) deleted!");
 				return true;
 			}

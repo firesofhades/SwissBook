@@ -1,6 +1,6 @@
 name: SwissBook
 main: tk.mapzcraft.firesofhades.SwissBook.SwissBook
-version: 0.1
+version: 0.2
 commands:
   swissbook:
     description: SwissBook master command
