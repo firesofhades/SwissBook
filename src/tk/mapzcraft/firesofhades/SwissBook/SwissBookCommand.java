@@ -1,6 +1,8 @@
 package tk.mapzcraft.firesofhades.SwissBook;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -9,6 +11,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
@@ -25,7 +28,49 @@ public class SwissBookCommand implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label,
 			String[] args) {
+		HashSet<Byte> t = new HashSet<Byte>();
+		t.add((byte) 0);
 		Player player = Bukkit.getPlayer(sender.getName());
+		if ((label.toString().equalsIgnoreCase("manual"))
+				&& player.hasPermission("swissbook.manual")) {
+			if (plugin.manual.getItemStack("Manual") == null) {
+				sender.sendMessage("no manual found!");
+				return true;
+			}
+			ItemStack manual = plugin.manual.getItemStack("Manual");
+			manual.setAmount(1);
+			if (args.length == 0 || args.length == 1) {
+				if (args.length == 1
+						&& player.hasPermission("swissbook.manual.other")) {
+
+					if (Bukkit.getPlayer(args[0]) != null) {
+						if (Bukkit.getPlayer(args[0]).isOnline()) {
+							player = Bukkit.getPlayer(args[0].toString());
+						} else {
+							sender.sendMessage("That player is not online");
+							return true;
+						}
+					} else {
+						sender.sendMessage("That player is not found");
+						return true;
+					}
+				}
+				Inventory i = player.getInventory();
+
+				i.addItem(manual);
+				player.updateInventory();
+				if (args.length == 1) {
+					sender.sendMessage("A manual has been given to "
+							+ player.getName().toString());
+					player.sendMessage("You have been given a manual by "
+							+ sender.getName().toString());
+				} else {
+					sender.sendMessage("a manual has been placed in your inventory!");
+				}
+				return true;
+			}
+
+		}
 		if (player.getItemInHand().equals(null)
 				|| (!(sender instanceof Player))) {
 			sender.sendMessage("Please take a book in your hand!");
@@ -33,7 +78,6 @@ public class SwissBookCommand implements CommandExecutor {
 		}
 		if ((label.toString().equalsIgnoreCase("swissbook"))
 				|| (label.toString().equalsIgnoreCase("sb"))
-				&& (!(args[0].equalsIgnoreCase("unlimited")))
 				&& ((player.getItemInHand().getType()
 						.equals(Material.BOOK_AND_QUILL)) || (player
 						.getItemInHand().getType()
@@ -63,7 +107,12 @@ public class SwissBookCommand implements CommandExecutor {
 
 			if (args[0].equalsIgnoreCase("get")
 					&& (args.length == 4 || args.length == 5)) {
-				if (!(sender.hasPermission("swissbook.get"))) {
+				if ((!(sender.hasPermission("swissbook.get")) && (player
+						.getItemInHand().getType()
+						.equals(Material.BOOK_AND_QUILL)))
+						|| ((!(sender.hasPermission("swissbook.get.signed")) && (player
+								.getItemInHand().getType()
+								.equals(Material.WRITTEN_BOOK))))) {
 					sender.sendMessage("No permission!");
 					return true;
 				}
@@ -144,7 +193,13 @@ public class SwissBookCommand implements CommandExecutor {
 			if ((args[0].equalsIgnoreCase("replace"))
 					&& ((args.length == 5) || (args.length == 6))) {
 				try {
-					if (!(sender.hasPermission("swissbook.replace"))) {
+					if ((!(sender.hasPermission("swissbook.replace")) && (player
+							.getItemInHand().getType()
+							.equals(Material.BOOK_AND_QUILL)))
+							|| ((!(sender
+									.hasPermission("swissbook.replace.signed")) && (player
+									.getItemInHand().getType()
+									.equals(Material.WRITTEN_BOOK))))) {
 						sender.sendMessage("No permission!");
 						return true;
 					}
@@ -190,7 +245,8 @@ public class SwissBookCommand implements CommandExecutor {
 					sender.sendMessage(newContent + "(PREVIEW!!!)");
 					return true;
 				} else {
-					player.getInventory().remove(player.getInventory().getHeldItemSlot());
+					player.getInventory().remove(
+							player.getInventory().getHeldItemSlot());
 					bm.setPages(pages);
 					book.setItemMeta(bm);
 					sender.sendMessage("Text replaced!");
@@ -204,7 +260,8 @@ public class SwissBookCommand implements CommandExecutor {
 					return true;
 				}
 				bm.setAuthor(args[1]);
-				player.getInventory().remove(player.getInventory().getHeldItemSlot());
+				player.getInventory().remove(
+						player.getInventory().getHeldItemSlot());
 				book.setItemMeta(bm);
 				sender.sendMessage("Author changed!");
 				return true;
@@ -224,14 +281,20 @@ public class SwissBookCommand implements CommandExecutor {
 				x = newContent.length();
 				newContent = newContent.substring(0, x - 1);
 				bm.setTitle(newContent);
-				player.getInventory().remove(player.getInventory().getHeldItemSlot());
+				player.getInventory().remove(
+						player.getInventory().getHeldItemSlot());
 				book.setItemMeta(bm);
 				sender.sendMessage("Title changed!");
 				return true;
 			}
 			if (args[0].equalsIgnoreCase("copyr")
 					&& ((args.length == 7) || (args.length == 8))) {
-				if (!(sender.hasPermission("swissbook.copyr"))) {
+				if ((!(sender.hasPermission("swissbook.copyr")) && (player
+						.getItemInHand().getType()
+						.equals(Material.BOOK_AND_QUILL)))
+						|| ((!(sender.hasPermission("swissbook.copyr.signed")) && (player
+								.getItemInHand().getType()
+								.equals(Material.WRITTEN_BOOK))))) {
 					sender.sendMessage("No permission!");
 					return true;
 				}
@@ -299,7 +362,8 @@ public class SwissBookCommand implements CommandExecutor {
 				}
 				pages.set(page1 - 1, newContent);
 				bm.setPages(pages);
-				player.getInventory().remove(player.getInventory().getHeldItemSlot());
+				player.getInventory().remove(
+						player.getInventory().getHeldItemSlot());
 				book.setItemMeta(bm);
 				sender.sendMessage("Text copied and replaced!");
 				return true;
@@ -307,7 +371,13 @@ public class SwissBookCommand implements CommandExecutor {
 			if ((args[0].equalsIgnoreCase("insert"))
 					&& ((args.length == 4) || (args.length == 5))) {
 				try {
-					if (!(sender.hasPermission("swissbook.insert"))) {
+					if ((!(sender.hasPermission("swissbook.insert")) && (player
+							.getItemInHand().getType()
+							.equals(Material.BOOK_AND_QUILL)))
+							|| ((!(sender
+									.hasPermission("swissbook.insert.signed")) && (player
+									.getItemInHand().getType()
+									.equals(Material.WRITTEN_BOOK))))) {
 						sender.sendMessage("No permission!");
 						return true;
 					}
@@ -375,7 +445,8 @@ public class SwissBookCommand implements CommandExecutor {
 					sender.sendMessage(newContent + "(PREVIEW!!!)");
 					return true;
 				} else {
-					player.getInventory().remove(player.getInventory().getHeldItemSlot());
+					player.getInventory().remove(
+							player.getInventory().getHeldItemSlot());
 					bm.setPages(pages);
 					book.setItemMeta(bm);
 					sender.sendMessage("Text inserted!");
@@ -385,7 +456,12 @@ public class SwissBookCommand implements CommandExecutor {
 
 			if (args[0].equalsIgnoreCase("copy")
 					&& ((args.length == 6) || (args.length == 7))) {
-				if (!(sender.hasPermission("swissbook.copy"))) {
+				if ((!(sender.hasPermission("swissbook.copy")) && (player
+						.getItemInHand().getType()
+						.equals(Material.BOOK_AND_QUILL)))
+						|| ((!(sender.hasPermission("swissbook.copy.signed")) && (player
+								.getItemInHand().getType()
+								.equals(Material.WRITTEN_BOOK))))) {
 					sender.sendMessage("No permission!");
 					return true;
 				}
@@ -477,7 +553,8 @@ public class SwissBookCommand implements CommandExecutor {
 				}
 				pages.set(page1 - 1, newContent);
 				bm.setPages(pages);
-				player.getInventory().remove(player.getInventory().getHeldItemSlot());
+				player.getInventory().remove(
+						player.getInventory().getHeldItemSlot());
 				book.setItemMeta(bm);
 				sender.sendMessage("Text copied!");
 				return true;
@@ -485,7 +562,13 @@ public class SwissBookCommand implements CommandExecutor {
 			if ((args[0].equalsIgnoreCase("delete"))
 					&& ((args.length == 4) || (args.length == 5))) {
 				try {
-					if (!(sender.hasPermission("swissbook.delete"))) {
+					if ((!(sender.hasPermission("swissbook.delete")) && (player
+							.getItemInHand().getType()
+							.equals(Material.BOOK_AND_QUILL)))
+							|| ((!(sender
+									.hasPermission("swissbook.delete.signed")) && (player
+									.getItemInHand().getType()
+									.equals(Material.WRITTEN_BOOK))))) {
 						sender.sendMessage("No permission!");
 						return true;
 					}
@@ -531,7 +614,8 @@ public class SwissBookCommand implements CommandExecutor {
 					sender.sendMessage(newContent + "(PREVIEW!!!)");
 					return true;
 				} else {
-					player.getInventory().remove(player.getInventory().getHeldItemSlot());
+					player.getInventory().remove(
+							player.getInventory().getHeldItemSlot());
 					bm.setPages(pages);
 					book.setItemMeta(bm);
 					sender.sendMessage("Text deleted!");
@@ -542,7 +626,13 @@ public class SwissBookCommand implements CommandExecutor {
 			if ((args[0].equalsIgnoreCase("addp"))
 					&& ((args.length == 1) || (args.length == 2))) {
 				try {
-					if (!(sender.hasPermission("swissbook.page.add"))) {
+					if ((!(sender.hasPermission("swissbook.page.add")) && (player
+							.getItemInHand().getType()
+							.equals(Material.BOOK_AND_QUILL)))
+							|| ((!(sender
+									.hasPermission("swissbook.page.add.signed")) && (player
+									.getItemInHand().getType()
+									.equals(Material.WRITTEN_BOOK))))) {
 						sender.sendMessage("No permission!");
 						return true;
 					}
@@ -571,7 +661,8 @@ public class SwissBookCommand implements CommandExecutor {
 					pages.add("");
 					page = page - 1;
 				}
-				player.getInventory().remove(player.getInventory().getHeldItemSlot());
+				player.getInventory().remove(
+						player.getInventory().getHeldItemSlot());
 				bm.setPages(pages);
 				book.setItemMeta(bm);
 				sender.sendMessage("Page(s) added!");
@@ -580,7 +671,13 @@ public class SwissBookCommand implements CommandExecutor {
 			if ((args[0].equalsIgnoreCase("insertp"))
 					&& ((args.length == 2) || (args.length == 3))) {
 				try {
-					if (!(sender.hasPermission("swissbook.page.insert"))) {
+					if ((!(sender.hasPermission("swissbook.page.insert")) && (player
+							.getItemInHand().getType()
+							.equals(Material.BOOK_AND_QUILL)))
+							|| ((!(sender
+									.hasPermission("swissbook.page.insert.signed")) && (player
+									.getItemInHand().getType()
+									.equals(Material.WRITTEN_BOOK))))) {
 						sender.sendMessage("No permission!");
 						return true;
 					}
@@ -614,7 +711,8 @@ public class SwissBookCommand implements CommandExecutor {
 					pages.add(fChar - 1, "");
 					page = page - 1;
 				}
-				player.getInventory().remove(player.getInventory().getHeldItemSlot());
+				player.getInventory().remove(
+						player.getInventory().getHeldItemSlot());
 				bm.setPages(pages);
 				book.setItemMeta(bm);
 				sender.sendMessage("Page(s) inserted!");
@@ -622,7 +720,13 @@ public class SwissBookCommand implements CommandExecutor {
 			}
 			if ((args[0].equalsIgnoreCase("movep")) && (args.length == 3)) {
 				try {
-					if (!(sender.hasPermission("swissbook.page.move"))) {
+					if ((!(sender.hasPermission("swissbook.page.move")) && (player
+							.getItemInHand().getType()
+							.equals(Material.BOOK_AND_QUILL)))
+							|| ((!(sender
+									.hasPermission("swissbook.page.move.signed")) && (player
+									.getItemInHand().getType()
+									.equals(Material.WRITTEN_BOOK))))) {
 						sender.sendMessage("No permission!");
 						return true;
 					}
@@ -652,7 +756,8 @@ public class SwissBookCommand implements CommandExecutor {
 				pages.remove(page - 1);
 				pages.add(fChar - 1, newContent);
 
-				player.getInventory().remove(player.getInventory().getHeldItemSlot());
+				player.getInventory().remove(
+						player.getInventory().getHeldItemSlot());
 				bm.setPages(pages);
 				book.setItemMeta(bm);
 				sender.sendMessage("Page moved!");
@@ -661,7 +766,13 @@ public class SwissBookCommand implements CommandExecutor {
 			if ((args[0].equalsIgnoreCase("deletep"))
 					&& ((args.length == 3) || (args.length == 2))) {
 				try {
-					if (!(sender.hasPermission("swissbook.page.delete"))) {
+					if ((!(sender.hasPermission("swissbook.page.delete")) && (player
+							.getItemInHand().getType()
+							.equals(Material.BOOK_AND_QUILL)))
+							|| ((!(sender
+									.hasPermission("swissbook.page.delete.signed")) && (player
+									.getItemInHand().getType()
+									.equals(Material.WRITTEN_BOOK))))) {
 						sender.sendMessage("No permission!");
 						return true;
 					}
@@ -699,7 +810,8 @@ public class SwissBookCommand implements CommandExecutor {
 					pages.remove(page - 1);
 				}
 
-				player.getInventory().remove(player.getInventory().getHeldItemSlot());
+				player.getInventory().remove(
+						player.getInventory().getHeldItemSlot());
 				bm.setPages(pages);
 				book.setItemMeta(bm);
 				sender.sendMessage("Page(s) deleted!");
@@ -711,6 +823,7 @@ public class SwissBookCommand implements CommandExecutor {
 					sender.sendMessage("No permission!");
 					return true;
 				}
+				if(!(player.getItemInHand().equals(Material.WRITTEN_BOOK))){return true;}
 				if (args.length == 2) {
 					try {
 						Integer.parseInt(args[1]);
@@ -725,13 +838,50 @@ public class SwissBookCommand implements CommandExecutor {
 							+ Integer.parseInt(args[1]);
 				}
 				player.getInventory().getItemInHand().setAmount(x);
-				player.updateInventory();
 				sender.sendMessage("Book(s) added!");
 				return true;
 			}
 
-		}
+			if (args[0].equalsIgnoreCase("setm") && (args.length == 1)) {
+				if (!(sender.hasPermission("swissbook.setmanual"))) {
+					sender.sendMessage("No permission!");
+					return true;
+				}
+				if (player.getItemInHand().getType()
+						.equals(Material.WRITTEN_BOOK)) {
 
+					plugin.manual.set("Manual", player.getItemInHand());
+					try {
+						plugin.manual.save(plugin.manualFile);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+
+					sender.sendMessage("Manual set!");
+					return true;
+
+				}
+			}
+			if (args[0].equalsIgnoreCase("unsign")) {
+				if (!(sender.hasPermission("swissbook.unsign"))) {
+					sender.sendMessage("No permission!");
+					return true;
+				}
+				if (!book.getType().equals(Material.WRITTEN_BOOK)
+						|| (!((BookMeta) book.getItemMeta()).getAuthor()
+								.toString().equalsIgnoreCase(player.getName()
+								.toString())&&!(sender.hasPermission("swissbook.unsign.other")))) {
+					sender.sendMessage("You are not holding a written book you signed!");
+					return true;
+				}
+				bm.setAuthor("");
+				bm.setTitle("");
+				book.setItemMeta(bm);
+				book.setType(Material.BOOK_AND_QUILL);
+				sender.sendMessage("Book unsigned!");
+				return true;
+			}
+		}
 		sender.sendMessage("Please read the documentation.");
 		return true;
 	}
