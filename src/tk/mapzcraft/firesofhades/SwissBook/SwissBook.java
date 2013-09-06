@@ -8,6 +8,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class SwissBook extends JavaPlugin {
@@ -29,6 +31,14 @@ public class SwissBook extends JavaPlugin {
 	    }
 	 manual = new YamlConfiguration();
 	    loadYamls();
+	    if(!manual.contains("oldManuals")){
+	    	List<String> om = new ArrayList<String> ();
+	    	om.add("exampleTitle");
+	    	manual.createSection("oldManuals");
+	    	manual.set("oldManuals", om);
+	    	saveYamls();
+	    }
+	    
 	}
 
 	public void onDisable() {
