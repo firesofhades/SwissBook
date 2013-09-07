@@ -1,9 +1,7 @@
 package tk.mapzcraft.firesofhades.SwissBook;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.EntityType;

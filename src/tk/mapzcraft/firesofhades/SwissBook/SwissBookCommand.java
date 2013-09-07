@@ -71,8 +71,21 @@ public class SwissBookCommand implements CommandExecutor {
 			}
 
 		}
-		if (player.getItemInHand().equals(null)
-				|| (!(sender instanceof Player))) {
+		if (((label.toString().equalsIgnoreCase("swissbook"))
+				|| (label.toString().equalsIgnoreCase("sb")))&&(args[0].equalsIgnoreCase("toggle"))){
+			if(!plugin.aMode.contains(player.getName().toString())){
+			plugin.aMode.add(player.getName().toString());
+			player.sendMessage("swissbook: advanced mode enabled");
+			return true;
+			}
+			else{
+				plugin.aMode.remove(player.getName().toString());
+				player.sendMessage("swissbook: advanced mode disabled");
+				return true;
+			}
+		}
+		if ((!player.getItemInHand().getType().equals(Material.BOOK_AND_QUILL)
+				&& !player.getItemInHand().getType().equals(Material.WRITTEN_BOOK))|| !(sender instanceof Player)) {
 			sender.sendMessage("Please take a book in your hand!");
 			return true;
 		}
@@ -86,6 +99,7 @@ public class SwissBookCommand implements CommandExecutor {
 			String pageContent = "";
 			String newContent = "";
 			String gOutput = "";
+			String fString = "";
 			Integer page = 0;
 			Integer bChar = 0;
 			Integer fChar = 0;
@@ -190,8 +204,9 @@ public class SwissBookCommand implements CommandExecutor {
 				sender.sendMessage("Requested text reads: " + gOutput);
 				return true;
 			}
-			if ((args[0].equalsIgnoreCase("replace"))
-					&& ((args.length == 5) || (args.length == 6))) {
+			
+			if ((args[0].equalsIgnoreCase("replaceall"))
+					&& ((args.length == 4) || (args.length == 5))&&!plugin.aMode.contains(player.getName().toString())) {
 				try {
 					if ((!(sender.hasPermission("swissbook.replace")) && (player
 							.getItemInHand().getType()
@@ -203,6 +218,129 @@ public class SwissBookCommand implements CommandExecutor {
 						sender.sendMessage("No permission!");
 						return true;
 					}
+												
+					
+					fString = args[1];
+					fString = fString.replace(ospc, spc);
+					fString = fString.replace(olf, lf);
+					newContent = args[2];
+					newContent = newContent.replace(ospc, spc);
+					newContent = newContent.replace(olf, lf);
+					page = Integer.parseInt(args[3]);
+
+				} catch (NumberFormatException e) {
+					sender.sendMessage("Failed parsing, make sure you are using numbers where neccesary");
+					return true;
+				}
+				if (bm.hasPages()) {
+					pages = Lists.newArrayList(bm.getPages());
+					if (pages.size() < page - 1) {
+						sender.sendMessage("Can not find page!");
+						return true;
+					}
+				} else {
+					sender.sendMessage("Can not find page!");
+					return true;
+				}
+				pageContent = pages.get(page - 1);
+
+				if (!pageContent.contains(fString)) {
+					player.sendMessage("could not find the text to replace: "+ fString);
+					return true;
+				}
+				
+					newContent = pageContent.replaceAll(fString, newContent);
+			
+				pages.set(page - 1, newContent);
+				if (preview) {
+					sender.sendMessage(newContent + "(PREVIEW!!!)");
+					return true;
+				} else {
+					player.getInventory().remove(
+							player.getInventory().getHeldItemSlot());
+					bm.setPages(pages);
+					book.setItemMeta(bm);
+					sender.sendMessage("Text replaced!");
+					return true;
+				}
+			}
+			
+			if ((args[0].equalsIgnoreCase("replace"))
+					&& ((args.length == 4) || (args.length == 5))&&!plugin.aMode.contains(player.getName().toString())) {
+				try {
+					if ((!(sender.hasPermission("swissbook.replace")) && (player
+							.getItemInHand().getType()
+							.equals(Material.BOOK_AND_QUILL)))
+							|| ((!(sender
+									.hasPermission("swissbook.replace.signed")) && (player
+									.getItemInHand().getType()
+									.equals(Material.WRITTEN_BOOK))))) {
+						sender.sendMessage("No permission!");
+						return true;
+					}
+												
+					
+					fString = args[1];
+					fString = fString.replace(ospc, spc);
+					fString = fString.replace(olf, lf);
+					newContent = args[2];
+					newContent = newContent.replace(ospc, spc);
+					newContent = newContent.replace(olf, lf);
+					page = Integer.parseInt(args[3]);
+
+				} catch (NumberFormatException e) {
+					sender.sendMessage("Failed parsing, make sure you are using numbers where neccesary");
+					return true;
+				}
+				if (bm.hasPages()) {
+					pages = Lists.newArrayList(bm.getPages());
+					if (pages.size() < page - 1) {
+						sender.sendMessage("Can not find page!");
+						return true;
+					}
+				} else {
+					sender.sendMessage("Can not find page!");
+					return true;
+				}
+				pageContent = pages.get(page - 1);
+
+				if (!pageContent.contains(fString)) {
+					player.sendMessage("could not find the text to replace: "+ fString);
+					return true;
+				}
+				
+					newContent = pageContent.replace(fString, newContent);
+			
+				pages.set(page - 1, newContent);
+				if (preview) {
+					sender.sendMessage(newContent + "(PREVIEW!!!)");
+					return true;
+				} else {
+					player.getInventory().remove(
+							player.getInventory().getHeldItemSlot());
+					bm.setPages(pages);
+					book.setItemMeta(bm);
+					sender.sendMessage("Text replaced!");
+					return true;
+				}
+			}
+			
+			
+			if ((args[0].equalsIgnoreCase("replace"))
+					&& ((args.length == 5) || (args.length == 6))&&plugin.aMode.contains(player.getName().toString())) {
+				try {
+					if ((!(sender.hasPermission("swissbook.replace")) && (player
+							.getItemInHand().getType()
+							.equals(Material.BOOK_AND_QUILL)))
+							|| ((!(sender
+									.hasPermission("swissbook.replace.signed")) && (player
+									.getItemInHand().getType()
+									.equals(Material.WRITTEN_BOOK))))) {
+						sender.sendMessage("No permission!");
+						return true;
+					}
+												
+					
 					fChar = Integer.parseInt(args[1]);
 					bChar = Integer.parseInt(args[2]);
 					page = Integer.parseInt(args[3]);
@@ -288,7 +426,7 @@ public class SwissBookCommand implements CommandExecutor {
 				return true;
 			}
 			if (args[0].equalsIgnoreCase("copyr")
-					&& ((args.length == 7) || (args.length == 8))) {
+					&& ((args.length == 7) || (args.length == 8))&&plugin.aMode.contains(player.getName().toString())) {
 				if ((!(sender.hasPermission("swissbook.copyr")) && (player
 						.getItemInHand().getType()
 						.equals(Material.BOOK_AND_QUILL)))
@@ -368,8 +506,87 @@ public class SwissBookCommand implements CommandExecutor {
 				sender.sendMessage("Text copied and replaced!");
 				return true;
 			}
+			
 			if ((args[0].equalsIgnoreCase("insert"))
-					&& ((args.length == 4) || (args.length == 5))) {
+					&& ((args.length == 4) || (args.length == 5))&&!plugin.aMode.contains(player.getName().toString())) {
+				try {
+					if ((!(sender.hasPermission("swissbook.insert")) && (player
+							.getItemInHand().getType()
+							.equals(Material.BOOK_AND_QUILL)))
+							|| ((!(sender
+									.hasPermission("swissbook.insert.signed")) && (player
+									.getItemInHand().getType()
+									.equals(Material.WRITTEN_BOOK))))) {
+						sender.sendMessage("No permission!");
+						return true;
+					}
+					newContent = (args[1]);
+					newContent = newContent.replace(ospc, spc);
+					newContent = newContent.replace(olf, lf);
+					page = Integer.parseInt(args[2]);
+
+				} catch (NumberFormatException e) {
+					sender.sendMessage("Failed parsing, make sure you are using numbers where neccesary");
+					return true;
+				}
+				fString = args[3];
+				fString = fString.replace(ospc, spc);
+				fString = fString.replace(olf, lf);
+				if (bm.hasPages()) {
+					pages = Lists.newArrayList(bm.getPages());
+					if (bm.getPageCount() < page) {
+						if ((pages.size() + page) > 500) {
+							sender.sendMessage("Exceeding page limit!");
+							return true;
+						}
+						while (pages.size() < page) {
+
+							pages.add("");
+						}
+					}
+				} else {
+					if (bm.getPageCount() < page) {
+						if ((pages.size() + page) > 500) {
+							sender.sendMessage("Exceeding page limit!");
+							return true;
+						}
+						while (pages.size() < page) {
+							pages.add("");
+						}
+					}
+				}
+				pageContent = pages.get(page - 1);
+				if (!pageContent.contains(fString)) {
+					player.sendMessage("could not find the text to insert after: "+ fString);
+					return true;
+				}
+
+			
+					newContent = ((pageContent.split(fString))[0]+fString+newContent);
+					int x = 1;
+				while((pageContent.split(fString)).length>x){
+					newContent = newContent+pageContent.split(fString)[x];
+					x = x+1;
+				}
+
+				pages.set(page - 1, newContent);
+				if (preview) {
+					sender.sendMessage(newContent + "(PREVIEW!!!)");
+					return true;
+				} else {
+					player.getInventory().remove(
+							player.getInventory().getHeldItemSlot());
+					bm.setPages(pages);
+					book.setItemMeta(bm);
+					sender.sendMessage("Text inserted!");
+					return true;
+				}
+			}
+
+			
+			
+			if ((args[0].equalsIgnoreCase("insert"))
+					&& ((args.length == 4) || (args.length == 5))&&plugin.aMode.contains(player.getName().toString())) {
 				try {
 					if ((!(sender.hasPermission("swissbook.insert")) && (player
 							.getItemInHand().getType()
@@ -455,7 +672,7 @@ public class SwissBookCommand implements CommandExecutor {
 			}
 
 			if (args[0].equalsIgnoreCase("copy")
-					&& ((args.length == 6) || (args.length == 7))) {
+					&& ((args.length == 6) || (args.length == 7))&&plugin.aMode.contains(player.getName().toString())) {
 				if ((!(sender.hasPermission("swissbook.copy")) && (player
 						.getItemInHand().getType()
 						.equals(Material.BOOK_AND_QUILL)))
@@ -559,8 +776,68 @@ public class SwissBookCommand implements CommandExecutor {
 				sender.sendMessage("Text copied!");
 				return true;
 			}
+			
 			if ((args[0].equalsIgnoreCase("delete"))
-					&& ((args.length == 4) || (args.length == 5))) {
+					&& ((args.length == 3) || (args.length == 4))&&!plugin.aMode.contains(player.getName().toString())) {
+				try {
+					if ((!(sender.hasPermission("swissbook.delete")) && (player
+							.getItemInHand().getType()
+							.equals(Material.BOOK_AND_QUILL)))
+							|| ((!(sender
+									.hasPermission("swissbook.delete.signed")) && (player
+									.getItemInHand().getType()
+									.equals(Material.WRITTEN_BOOK))))) {
+						sender.sendMessage("No permission!");
+						return true;
+					}
+					fString = args[1];
+					fString = fString.replace(ospc, spc);
+					fString = fString.replace(olf, lf);
+					page = Integer.parseInt(args[2]);
+
+				} catch (NumberFormatException e) {
+					sender.sendMessage("Failed parsing, make sure you are using numbers where neccesary");
+					return true;
+
+				}
+				newContent = "";
+				if (bm.hasPages()) {
+					pages = Lists.newArrayList(bm.getPages());
+					if (pages.size() < page - 1) {
+						sender.sendMessage("Can not find page!");
+						return true;
+					}
+				} else {
+					sender.sendMessage("Can not find page!");
+					return true;
+				}
+				pageContent = pages.get(page - 1);
+
+				
+					newContent = (pageContent.split(fString))[0]+(pageContent.split(fString))[1];
+			int x = 2;
+			while((pageContent.split(fString)).length>x){
+				newContent = newContent+fString+pageContent.split(fString)[x];
+				x = x+1;
+			}
+		
+				pages.set(page - 1, newContent);
+				if (preview) {
+					sender.sendMessage(newContent + "(PREVIEW!!!)");
+					return true;
+				} else {
+					player.getInventory().remove(
+							player.getInventory().getHeldItemSlot());
+					bm.setPages(pages);
+					book.setItemMeta(bm);
+					sender.sendMessage("Text deleted!");
+					return true;
+				}
+			}
+
+			
+			if ((args[0].equalsIgnoreCase("delete"))
+					&& ((args.length == 4) || (args.length == 5))&&plugin.aMode.contains(player.getName().toString())) {
 				try {
 					if ((!(sender.hasPermission("swissbook.delete")) && (player
 							.getItemInHand().getType()
@@ -882,7 +1159,15 @@ public class SwissBookCommand implements CommandExecutor {
 				return true;
 			}
 		}
-		sender.sendMessage("Please read the documentation.");
+		if (!plugin.aMode.contains(player.getName().toString())){
+		sender.sendMessage("Please read the documentation. advanced mode is currently: disabled");
 		return true;
-	}
+		}
+		if (plugin.aMode.contains(player.getName().toString())){
+			sender.sendMessage("Please read the documentation. advanced mode is currently: enabled");
+			return true;
+			}
+			sender.sendMessage("Please read the documentation.");
+	return true;}
+
 }

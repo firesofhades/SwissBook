@@ -18,7 +18,7 @@ public class SwissBook extends JavaPlugin {
 			this);
 	public FileConfiguration manual;
 	public static final Logger log = Logger.getLogger("Minecraft");
-
+	public ArrayList<String> aMode = new ArrayList<String>();
 	public void onEnable() {
 		getServer().getPluginManager().registerEvents(playerListener, this);
 		getCommand("swissbook").setExecutor(new SwissBookCommand(this));
