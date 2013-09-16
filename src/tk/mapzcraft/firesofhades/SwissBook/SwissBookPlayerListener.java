@@ -47,8 +47,10 @@ public class SwissBookPlayerListener implements Listener {
 	public void onPickupItem(PlayerPickupItemEvent event) {
 		ArrayList<String> om = new ArrayList<String>();
 		om.addAll(plugin.manual.getStringList("oldManuals"));
+		if(plugin.manual.contains("Manual")){
 		om.add(((BookMeta) plugin.manual.getItemStack("Manual").getItemMeta())
 				.getTitle().toString());
+		}
 		int x = 0;
 		while (om.size() > x) {
 			if (event.getItem().getItemStack().getType().equals(Material.WRITTEN_BOOK)) {
