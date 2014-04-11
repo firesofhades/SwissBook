@@ -8,6 +8,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerEditBookEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
@@ -26,7 +27,6 @@ public class SwissBookPlayerListener implements Listener {
 	Chest b;
 	BlockVector c1;
 
-	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onPlayerInteract(PlayerJoinEvent event) {
 		if (!(event.getPlayer().hasPlayedBefore())) {
@@ -36,12 +36,29 @@ public class SwissBookPlayerListener implements Listener {
 				Inventory i = event.getPlayer().getInventory();
 
 				i.addItem(manual);
-				event.getPlayer().updateInventory();
 				event.getPlayer().sendMessage(
 						"You have been given a manual, READ IT!!!");
 			}
 		}
 	}
+@EventHandler(priority = EventPriority.NORMAL)
+public void onBookEdit(PlayerEditBookEvent e){
+	
+	if(e.isSigning()){
+		BookMeta nbm = e.getNewBookMeta();
+		ArrayList<String> lore = new ArrayList<String>();
+		try {
+			lore.add(e.getPlayer().getUniqueId().toString());
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		
+		nbm.setLore(lore);
+		e.setNewBookMeta(nbm);
+	}
+	
+}
+
 
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onPickupItem(PlayerPickupItemEvent event) {

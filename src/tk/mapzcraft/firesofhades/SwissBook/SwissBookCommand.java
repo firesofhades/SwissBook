@@ -24,7 +24,6 @@ public class SwissBookCommand implements CommandExecutor {
 		this.plugin = plugin;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label,
 			String[] args) {
@@ -58,7 +57,6 @@ public class SwissBookCommand implements CommandExecutor {
 				Inventory i = player.getInventory();
 
 				i.addItem(manual);
-				player.updateInventory();
 				if (args.length == 1) {
 					sender.sendMessage("A manual has been given to "
 							+ player.getName().toString());
@@ -71,19 +69,8 @@ public class SwissBookCommand implements CommandExecutor {
 			}
 
 		}
-		if (((label.toString().equalsIgnoreCase("swissbook"))
-				|| (label.toString().equalsIgnoreCase("sb")))&&(args[0].equalsIgnoreCase("toggle"))){
-			if(!plugin.aMode.contains(player.getName().toString())){
-			plugin.aMode.add(player.getName().toString());
-			player.sendMessage("swissbook: advanced mode enabled");
-			return true;
-			}
-			else{
-				plugin.aMode.remove(player.getName().toString());
-				player.sendMessage("swissbook: advanced mode disabled");
-				return true;
-			}
-		}
+		if (args.length == 0){return false;}
+
 		if ((!player.getItemInHand().getType().equals(Material.BOOK_AND_QUILL)
 				&& !player.getItemInHand().getType().equals(Material.WRITTEN_BOOK))|| !(sender instanceof Player)) {
 			sender.sendMessage("Please take a book in your hand!");
@@ -110,6 +97,7 @@ public class SwissBookCommand implements CommandExecutor {
 			BookMeta bm = (BookMeta) book.getItemMeta();
 			ArrayList<String> pages = new ArrayList<String>();
 			pages.add("");
+			Boolean advanced = true;
 			Boolean preview = false;
 			char lf = 10;
 			char olf = 126;
@@ -117,6 +105,14 @@ public class SwissBookCommand implements CommandExecutor {
 			char spc = 32;
 			if (args[args.length - 1].equalsIgnoreCase("preview")) {
 				preview = true;
+			}
+			if (args.length>1){
+				try{
+				Integer.parseInt(args[1]);
+				}catch(NumberFormatException e){
+					advanced=false;
+				}
+				
 			}
 
 			if (args[0].equalsIgnoreCase("get")
@@ -171,33 +167,22 @@ public class SwissBookCommand implements CommandExecutor {
 							+ ")" + ChatColor.WHITE
 							+ pageContent.substring(fChar - 1, bChar);
 				} else {
-					while (fChar < bChar) {
-						if (fChar + (interval - 1) > bChar) {
-							gOutput = gOutput
-									+ ChatColor.AQUA
-									+ "("
-									+ fChar.toString()
-									+ ")"
-									+ ChatColor.WHITE
-									+ pageContent.substring(fChar - 1, fChar
-											+ (bChar - fChar));
-						} else {
-							gOutput = gOutput
-									+ ChatColor.AQUA
-									+ "("
-									+ fChar.toString()
-									+ ")"
-									+ ChatColor.WHITE
-									+ pageContent.substring(fChar - 1, fChar
-											+ (interval - 1));
-						}
-
-						if ((fChar + interval) <= bChar) {
-							fChar = fChar + interval;
-						} else {
-							fChar = fChar + (bChar - fChar);
-						}
+					String[] pCArray = pageContent.substring(fChar-1, bChar).split(" ");
+					for(String s : pCArray){
+						gOutput = gOutput + ChatColor.AQUA
+								+ "("
+								+ fChar.toString()
+								+ ")"
+								+ ChatColor.WHITE
+								+s +" ";
+						fChar = fChar + s.length()+1;
 					}
+					
+					int x = String.valueOf(fChar).length();
+					fChar=fChar-2;
+					sender.sendMessage(String.valueOf(x));
+					gOutput=gOutput.substring(0,gOutput.length()-1);
+					
 				}
 				gOutput = gOutput + ChatColor.AQUA + "(" + (fChar + 1) + ")"
 						+ ChatColor.WHITE;
@@ -206,7 +191,7 @@ public class SwissBookCommand implements CommandExecutor {
 			}
 			
 			if ((args[0].equalsIgnoreCase("replaceall"))
-					&& ((args.length == 4) || (args.length == 5))&&!plugin.aMode.contains(player.getName().toString())) {
+					&& ((args.length == 4) || (args.length == 5))&&!advanced) {
 				try {
 					if ((!(sender.hasPermission("swissbook.replace")) && (player
 							.getItemInHand().getType()
@@ -256,8 +241,6 @@ public class SwissBookCommand implements CommandExecutor {
 					sender.sendMessage(newContent + "(PREVIEW!!!)");
 					return true;
 				} else {
-					player.getInventory().remove(
-							player.getInventory().getHeldItemSlot());
 					bm.setPages(pages);
 					book.setItemMeta(bm);
 					sender.sendMessage("Text replaced!");
@@ -266,7 +249,7 @@ public class SwissBookCommand implements CommandExecutor {
 			}
 			
 			if ((args[0].equalsIgnoreCase("replace"))
-					&& ((args.length == 4) || (args.length == 5))&&!plugin.aMode.contains(player.getName().toString())) {
+					&& ((args.length == 4) || (args.length == 5))&&!advanced) {
 				try {
 					if ((!(sender.hasPermission("swissbook.replace")) && (player
 							.getItemInHand().getType()
@@ -316,8 +299,6 @@ public class SwissBookCommand implements CommandExecutor {
 					sender.sendMessage(newContent + "(PREVIEW!!!)");
 					return true;
 				} else {
-					player.getInventory().remove(
-							player.getInventory().getHeldItemSlot());
 					bm.setPages(pages);
 					book.setItemMeta(bm);
 					sender.sendMessage("Text replaced!");
@@ -327,7 +308,7 @@ public class SwissBookCommand implements CommandExecutor {
 			
 			
 			if ((args[0].equalsIgnoreCase("replace"))
-					&& ((args.length == 5) || (args.length == 6))&&plugin.aMode.contains(player.getName().toString())) {
+					&& ((args.length == 5) || (args.length == 6))&&advanced) {
 				try {
 					if ((!(sender.hasPermission("swissbook.replace")) && (player
 							.getItemInHand().getType()
@@ -383,8 +364,6 @@ public class SwissBookCommand implements CommandExecutor {
 					sender.sendMessage(newContent + "(PREVIEW!!!)");
 					return true;
 				} else {
-					player.getInventory().remove(
-							player.getInventory().getHeldItemSlot());
 					bm.setPages(pages);
 					book.setItemMeta(bm);
 					sender.sendMessage("Text replaced!");
@@ -397,9 +376,8 @@ public class SwissBookCommand implements CommandExecutor {
 					sender.sendMessage("No permission!");
 					return true;
 				}
+				
 				bm.setAuthor(args[1]);
-				player.getInventory().remove(
-						player.getInventory().getHeldItemSlot());
 				book.setItemMeta(bm);
 				sender.sendMessage("Author changed!");
 				return true;
@@ -419,14 +397,12 @@ public class SwissBookCommand implements CommandExecutor {
 				x = newContent.length();
 				newContent = newContent.substring(0, x - 1);
 				bm.setTitle(newContent);
-				player.getInventory().remove(
-						player.getInventory().getHeldItemSlot());
 				book.setItemMeta(bm);
 				sender.sendMessage("Title changed!");
 				return true;
 			}
 			if (args[0].equalsIgnoreCase("copyr")
-					&& ((args.length == 7) || (args.length == 8))&&plugin.aMode.contains(player.getName().toString())) {
+					&& ((args.length == 7) || (args.length == 8))&&advanced) {
 				if ((!(sender.hasPermission("swissbook.copyr")) && (player
 						.getItemInHand().getType()
 						.equals(Material.BOOK_AND_QUILL)))
@@ -500,15 +476,13 @@ public class SwissBookCommand implements CommandExecutor {
 				}
 				pages.set(page1 - 1, newContent);
 				bm.setPages(pages);
-				player.getInventory().remove(
-						player.getInventory().getHeldItemSlot());
 				book.setItemMeta(bm);
 				sender.sendMessage("Text copied and replaced!");
 				return true;
 			}
 			
 			if ((args[0].equalsIgnoreCase("insert"))
-					&& ((args.length == 4) || (args.length == 5))&&!plugin.aMode.contains(player.getName().toString())) {
+					&& ((args.length == 4) || (args.length == 5))&&!advanced) {
 				try {
 					if ((!(sender.hasPermission("swissbook.insert")) && (player
 							.getItemInHand().getType()
@@ -574,8 +548,6 @@ public class SwissBookCommand implements CommandExecutor {
 					sender.sendMessage(newContent + "(PREVIEW!!!)");
 					return true;
 				} else {
-					player.getInventory().remove(
-							player.getInventory().getHeldItemSlot());
 					bm.setPages(pages);
 					book.setItemMeta(bm);
 					sender.sendMessage("Text inserted!");
@@ -586,7 +558,7 @@ public class SwissBookCommand implements CommandExecutor {
 			
 			
 			if ((args[0].equalsIgnoreCase("insert"))
-					&& ((args.length == 4) || (args.length == 5))&&plugin.aMode.contains(player.getName().toString())) {
+					&& ((args.length == 4) || (args.length == 5))&&advanced) {
 				try {
 					if ((!(sender.hasPermission("swissbook.insert")) && (player
 							.getItemInHand().getType()
@@ -662,8 +634,6 @@ public class SwissBookCommand implements CommandExecutor {
 					sender.sendMessage(newContent + "(PREVIEW!!!)");
 					return true;
 				} else {
-					player.getInventory().remove(
-							player.getInventory().getHeldItemSlot());
 					bm.setPages(pages);
 					book.setItemMeta(bm);
 					sender.sendMessage("Text inserted!");
@@ -672,7 +642,7 @@ public class SwissBookCommand implements CommandExecutor {
 			}
 
 			if (args[0].equalsIgnoreCase("copy")
-					&& ((args.length == 6) || (args.length == 7))&&plugin.aMode.contains(player.getName().toString())) {
+					&& ((args.length == 6) || (args.length == 7))&&advanced) {
 				if ((!(sender.hasPermission("swissbook.copy")) && (player
 						.getItemInHand().getType()
 						.equals(Material.BOOK_AND_QUILL)))
@@ -770,15 +740,13 @@ public class SwissBookCommand implements CommandExecutor {
 				}
 				pages.set(page1 - 1, newContent);
 				bm.setPages(pages);
-				player.getInventory().remove(
-						player.getInventory().getHeldItemSlot());
 				book.setItemMeta(bm);
 				sender.sendMessage("Text copied!");
 				return true;
 			}
 			
 			if ((args[0].equalsIgnoreCase("delete"))
-					&& ((args.length == 3) || (args.length == 4))&&!plugin.aMode.contains(player.getName().toString())) {
+					&& ((args.length == 3) || (args.length == 4))&&!advanced) {
 				try {
 					if ((!(sender.hasPermission("swissbook.delete")) && (player
 							.getItemInHand().getType()
@@ -826,8 +794,6 @@ public class SwissBookCommand implements CommandExecutor {
 					sender.sendMessage(newContent + "(PREVIEW!!!)");
 					return true;
 				} else {
-					player.getInventory().remove(
-							player.getInventory().getHeldItemSlot());
 					bm.setPages(pages);
 					book.setItemMeta(bm);
 					sender.sendMessage("Text deleted!");
@@ -837,7 +803,7 @@ public class SwissBookCommand implements CommandExecutor {
 
 			
 			if ((args[0].equalsIgnoreCase("delete"))
-					&& ((args.length == 4) || (args.length == 5))&&plugin.aMode.contains(player.getName().toString())) {
+					&& ((args.length == 4) || (args.length == 5))&&advanced) {
 				try {
 					if ((!(sender.hasPermission("swissbook.delete")) && (player
 							.getItemInHand().getType()
@@ -891,8 +857,6 @@ public class SwissBookCommand implements CommandExecutor {
 					sender.sendMessage(newContent + "(PREVIEW!!!)");
 					return true;
 				} else {
-					player.getInventory().remove(
-							player.getInventory().getHeldItemSlot());
 					bm.setPages(pages);
 					book.setItemMeta(bm);
 					sender.sendMessage("Text deleted!");
@@ -938,8 +902,6 @@ public class SwissBookCommand implements CommandExecutor {
 					pages.add("");
 					page = page - 1;
 				}
-				player.getInventory().remove(
-						player.getInventory().getHeldItemSlot());
 				bm.setPages(pages);
 				book.setItemMeta(bm);
 				sender.sendMessage("Page(s) added!");
@@ -988,8 +950,6 @@ public class SwissBookCommand implements CommandExecutor {
 					pages.add(fChar - 1, "");
 					page = page - 1;
 				}
-				player.getInventory().remove(
-						player.getInventory().getHeldItemSlot());
 				bm.setPages(pages);
 				book.setItemMeta(bm);
 				sender.sendMessage("Page(s) inserted!");
@@ -1033,8 +993,6 @@ public class SwissBookCommand implements CommandExecutor {
 				pages.remove(page - 1);
 				pages.add(fChar - 1, newContent);
 
-				player.getInventory().remove(
-						player.getInventory().getHeldItemSlot());
 				bm.setPages(pages);
 				book.setItemMeta(bm);
 				sender.sendMessage("Page moved!");
@@ -1087,8 +1045,6 @@ public class SwissBookCommand implements CommandExecutor {
 					pages.remove(page - 1);
 				}
 
-				player.getInventory().remove(
-						player.getInventory().getHeldItemSlot());
 				bm.setPages(pages);
 				book.setItemMeta(bm);
 				sender.sendMessage("Page(s) deleted!");
@@ -1144,30 +1100,37 @@ public class SwissBookCommand implements CommandExecutor {
 					sender.sendMessage("No permission!");
 					return true;
 				}
-				if (!book.getType().equals(Material.WRITTEN_BOOK)
-						|| (!((BookMeta) book.getItemMeta()).getAuthor()
-								.toString().equalsIgnoreCase(player.getName()
-								.toString())&&!(sender.hasPermission("swissbook.unsign.other")))) {
-					sender.sendMessage("You are not holding a written book you signed!");
-					return true;
-				}
+				
+					if(bm.getLore()==null){
+						if (!book.getType().equals(Material.WRITTEN_BOOK)
+								|| (!((BookMeta) book.getItemMeta()).getAuthor()
+										.toString().equalsIgnoreCase(sender.getName()
+										.toString())&&!(sender.hasPermission("swissbook.unsign.other")))) {
+							sender.sendMessage("You are not holding a written book you signed!");
+							return true;
+						}
+					}else{
+					if (!book.getType().equals(Material.WRITTEN_BOOK)
+							|| (!((BookMeta) book.getItemMeta()).getLore().get(0)
+									.toString().equalsIgnoreCase(Bukkit.getServer().getPlayer(sender.getName()).getUniqueId()
+											.toString())&&!(sender.hasPermission("swissbook.unsign.other")))) {
+						sender.sendMessage("You are not holding a written book you signed!");
+						return true;
+					}
+					}
+			
+				
 				bm.setAuthor("");
 				bm.setTitle("");
+				bm.setLore(null);
 				book.setItemMeta(bm);
 				book.setType(Material.BOOK_AND_QUILL);
 				sender.sendMessage("Book unsigned!");
 				return true;
 			}
 		}
-		if (!plugin.aMode.contains(player.getName().toString())){
-		sender.sendMessage("Please read the documentation. advanced mode is currently: disabled");
-		return true;
-		}
-		if (plugin.aMode.contains(player.getName().toString())){
-			sender.sendMessage("Please read the documentation. advanced mode is currently: enabled");
-			return true;
-			}
 			sender.sendMessage("Please read the documentation.");
-	return true;}
+	return true;
+	}
 
 }

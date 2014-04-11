@@ -1,10 +1,10 @@
 name: SwissBook
 main: tk.mapzcraft.firesofhades.SwissBook.SwissBook
-version: 1.4
+version: 1.6
 commands:
   swissbook:
     description: SwissBook master command
     aliases: ['sb']
-    usage: /<command> [function] <args[]>
+    usage: 'please read the documentation at: http://dev.bukkit.org/bukkit-plugins/swissbook ,  the command does not exist or is used incorrectly.'
   manual:
     description: gives players a manual
